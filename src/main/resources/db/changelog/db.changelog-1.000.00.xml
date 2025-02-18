@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+	  http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+	<!-- Criação das estruturas de acesso -->
+            
+	<changeSet author="guilherme.gps" id="1.000.00">
+        <sql>
+        	CREATE TABLE START.usuario (
+				id uuid DEFAULT RANDOM_UUID() NOT NULL,
+				codigo INT GENERATED ALWAYS AS IDENTITY NOT NULL,
+				ativo bool DEFAULT true NOT NULL,
+				data_registro timestamp DEFAULT now() NOT NULL,
+				id_perfil uuid NULL,
+				login varchar(50) NOT NULL,
+				nome varchar(100) NOT NULL,
+				cpf varchar(11) NOT NULL,
+				senha varchar(60) NOT NULL,
+				email varchar(50) NOT NULL,
+				CONSTRAINT tb_usuario_codigo_key UNIQUE (codigo),
+				CONSTRAINT tb_usuario_cpf_key UNIQUE (cpf),
+				CONSTRAINT tb_usuario_email_key UNIQUE (email),
+				CONSTRAINT tb_usuario_login_key UNIQUE (login),
+				CONSTRAINT tb_usuario_pkey PRIMARY KEY (id)
+			);
+        </sql>
+	</changeSet>
+</databaseChangeLog>
