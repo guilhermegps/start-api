@@ -19,9 +19,9 @@ public class UsuarioController {
     private final UsuarioService service;
 
     @GetMapping
-    public ResponseEntity<?> detalhar() {
-    	var list = service.findAll();
-        return ResponseEntity.ok().build();
+    public ResponseEntity<String> detalhar() {
+    	var user = service.getUsuarioLogado();
+        return ResponseEntity.ok(user.getCpf());
     }
 
 }

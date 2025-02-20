@@ -8,44 +8,44 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.project.start.api.services.UsuarioService;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class CustomBasicAuthFilter extends OncePerRequestFilter {
+	
+	private final UsuarioService usuarioService;
 
     private static final int BASIC_LENGTH = 6;
-    private static final String EXEMPLO_USERNAME = "usuario";
-    private static final String EXEMPLO_PASSWORD = "123456";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        // Basic dXN1YXJpbzoxMjM0NTY=
         var headerAuthorization = request.getHeader("Authorization");
 
         if (headerAuthorization == null || !headerAuthorization.startsWith("Basic ")) {
             filterChain.doFilter(request, response);
             return;
         }
-        // dXN1YXJpbzoxMjM0NTY=
         var basicToken = headerAuthorization.substring(BASIC_LENGTH);
-        byte[] basicTokenDecoded = Base64.getDecoder().decode(basicToken);
-
-        // usuario:123456
-        String basicTokenValue = new String(basicTokenDecoded);
-
-        // ["usuario", "123456"]
-        String[] basicAuthsSplit = basicTokenValue.split(":");
-
-        if (basicAuthsSplit[0].equals(EXEMPLO_USERNAME) 
-              && basicAuthsSplit[1].equals(EXEMPLO_PASSWORD)) {
-
-            var authToken = new UsernamePasswordAuthenticationToken(basicAuthsSplit[0], null, null);
-            SecurityContextHolder.getContext().setAuthentication(authToken);
-        }
+        var basicTokenBytes = Base64.getDecoder().decode(basicToken);
+        var basicTokenValue = new String(basicTokenBytes);
+        var basicAuthsSplit = basicTokenValue.split(":");
+        
+        var userOpt = usuarioService.findByLogin(basicAuthsSplit[0]);
+        userOpt.ifPresent(user -> {
+        	if (user.getSenha().equals(basicAuthsSplit[1])) {
+        		var authToken = new UsernamePasswordAuthenticationToken(user, null, null);
+        		SecurityContextHolder.getContext().setAuthentication(authToken);
+        	}        	
+        });
+        
         filterChain.doFilter(request, response);
     }
 }
