@@ -1,34 +1,61 @@
 package com.project.start.api.commons.configs;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
-import com.project.start.api.commons.filters.CustomBasicAuthFilter;
+import com.project.start.api.commons.filters.JwtRequestFilter;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+	private final AuthenticationProvider authenticationProvider;
+    private final JwtRequestFilter jwtRequestFilter;
 	
 	@Bean
-    protected SecurityFilterChain filterChain(
-            HttpSecurity http,
-            CustomBasicAuthFilter customBasicAuthFilter) throws Exception {
-        http.authorizeHttpRequests(
-                authorizeConfig -> {
-                    authorizeConfig.requestMatchers("/public").permitAll();
-                    authorizeConfig.anyRequest().authenticated();
-                }
-        )
-        .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(customBasicAuthFilter, BasicAuthenticationFilter.class)
-                .csrf(csrf -> csrf.disable());
+    protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable())
+	        .authorizeHttpRequests(
+	                authorizeConfig -> {
+	                    authorizeConfig.requestMatchers("/auth/**").permitAll();
+	                    authorizeConfig.anyRequest().authenticated();
+	                }
+	        )
+	        .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+	        .authenticationProvider(authenticationProvider)
+            .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+            ;
 
         return http.build();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(List.of("http://localhost:8005"));
+        configuration.setAllowedMethods(List.of("GET","POST"));
+        configuration.setAllowedHeaders(List.of("Authorization","Content-Type"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration("/**",configuration);
+
+        return source;
     }
 
 }

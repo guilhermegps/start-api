@@ -1,5 +1,5 @@
 --liquibase formatted sql
---changeset guilherme.gps:1.000.00__CREATE_TABLES
+--changeset guilherme.gps:CREATE_AUTH_TABLES
 CREATE TABLE START.perfil (
 	id UUID DEFAULT RANDOM_UUID() NOT NULL,
 	codigo INT GENERATED ALWAYS AS IDENTITY NOT NULL UNIQUE,
@@ -16,7 +16,7 @@ CREATE TABLE START.usuario (
 	login varchar(50) NOT NULL UNIQUE,
 	nome varchar(100) NOT NULL,
 	cpf varchar(11) NOT NULL UNIQUE,
-	senha varchar(60) NOT NULL,
+	senha varchar(255) NOT NULL,
 	email varchar(50) NOT NULL UNIQUE,
 	CONSTRAINT pk_usuario PRIMARY KEY (id),
 	CONSTRAINT fk_usuario_perfil FOREIGN KEY (id_perfil) REFERENCES START.perfil(id)

@@ -18,10 +18,10 @@ public class UsuarioController {
 
     private final UsuarioService service;
 
-    @GetMapping
-    public ResponseEntity<String> detalhar() {
-    	var user = service.getUsuarioLogado();
-        return ResponseEntity.ok(user.getCpf());
-    }
+//    @GetMapping
+//    public ResponseEntity<String> detalhar() {
+//    	var user = service.getUsuarioLogado();
+//        return ResponseEntity.ok(user.getCpf());
+//    }
 
 }
