@@ -51,9 +51,9 @@ public class UsuarioService extends BaseService<Usuario> {
 			var authenticated = userPAToken.isAuthenticated();
 			
 			if(authenticated) {
-				var username = userPAToken.getPrincipal().toString();
+				var logado = (UsuarioLogado) userPAToken.getPrincipal();
 				
-				return findByLogin(username);
+				return findByLogin(logado.getUsername());
 			}
 		}
 		
