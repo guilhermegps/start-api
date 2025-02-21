@@ -29,19 +29,7 @@ public class AuthService {
 			e.printStackTrace();
 		}
 
-		return usuarioService.usuarioLogado(input.getLogin()).orElseThrow();
+		return usuarioService.authUsuario(input.getLogin()).orElseThrow();
 	}
-	
-//	public Usuario getUsuarioLogado() {
-//		Principal principal = SecurityContextHolder.getContext().getAuthentication();
-//		if(principal instanceof UsernamePasswordAuthenticationToken userPAToken) {
-//			var authenticated = userPAToken.isAuthenticated();
-//			
-//			if(authenticated)
-//				return (Usuario) userPAToken.getPrincipal();
-//		}
-//		
-//    	return null;
-//    }
 
 }

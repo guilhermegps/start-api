@@ -35,7 +35,7 @@ public class AuthConfig {
 
     @Bean
     UserDetailsService userDetailsService() {
-        return username -> usuarioService.usuarioLogado(username)
+        return username -> usuarioService.authUsuario(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 

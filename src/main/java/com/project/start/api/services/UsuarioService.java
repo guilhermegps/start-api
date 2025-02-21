@@ -1,7 +1,10 @@
 package com.project.start.api.services;
 
+import java.security.Principal;
 import java.util.Optional;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -26,7 +29,7 @@ public class UsuarioService extends BaseService<Usuario> {
 		return repository.findOneByLoginAndAtivo(login, Boolean.TRUE);
 	}
 	
-	public Optional<UsuarioLogado> usuarioLogado(String username) {
+	public Optional<UsuarioLogado> authUsuario(String username) {
 		var opt = repository.findOneByLoginAndAtivo(username, Boolean.TRUE);
 		var logado = opt.map(u -> UsuarioLogado.builder()
 							.username(u.getLogin())
@@ -37,5 +40,24 @@ public class UsuarioService extends BaseService<Usuario> {
 		
 		return Optional.ofNullable(logado);
 	}
+
+	public Usuario usuarioSessao() {
+		return getUsuarioLogado().orElseThrow();
+	}
+	
+	public Optional<Usuario> getUsuarioLogado() {
+		Principal principal = SecurityContextHolder.getContext().getAuthentication();
+		if(principal instanceof UsernamePasswordAuthenticationToken userPAToken) {
+			var authenticated = userPAToken.isAuthenticated();
+			
+			if(authenticated) {
+				var username = userPAToken.getPrincipal().toString();
+				
+				return findByLogin(username);
+			}
+		}
+		
+    	return Optional.empty();
+    }
 
 }

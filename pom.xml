@@ -38,6 +38,7 @@
 		<h2-version>2.1.210</h2-version>
 		<java.version>21</java.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
+	    <jjwt.version>0.9.1</jjwt.version>
 	</properties>
 	<dependencies>
 		<!-- WEB -->
@@ -59,18 +60,8 @@
 		</dependency>
 		<dependency>
 		    <groupId>io.jsonwebtoken</groupId>
-		    <artifactId>jjwt-api</artifactId>
-		    <version>0.12.0</version>
-		</dependency>
-		<dependency>
-		    <groupId>io.jsonwebtoken</groupId>
-		    <artifactId>jjwt-impl</artifactId>
-		    <version>0.12.0</version>
-		</dependency>
-		<dependency>
-		    <groupId>io.jsonwebtoken</groupId>
-		    <artifactId>jjwt-jackson</artifactId>
-		    <version>0.12.0</version>
+    		<artifactId>jjwt</artifactId>
+		    <version>${jjwt.version}</version>
 		</dependency>
 
 		<!-- DATABASE -->
@@ -123,6 +114,11 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
+						</path>
+						<path>
+							<groupId>org.mapstruct</groupId>
+							<artifactId>mapstruct-processor</artifactId>
+							<version>${mapstruct.version}</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>

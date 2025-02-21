@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.start.api.domain.dtos.UsuarioDto;
+import com.project.start.api.domain.mappers.UsuarioMapper;
 import com.project.start.api.services.UsuarioService;
 
 import lombok.RequiredArgsConstructor;
@@ -17,11 +19,12 @@ import lombok.RequiredArgsConstructor;
 public class UsuarioController {
 
     private final UsuarioService service;
+    private final UsuarioMapper mapper;
 
-//    @GetMapping
-//    public ResponseEntity<String> detalhar() {
-//    	var user = service.getUsuarioLogado();
-//        return ResponseEntity.ok(user.getCpf());
-//    }
+    @GetMapping("/me")
+    public ResponseEntity<UsuarioDto> usuarioSessao() {
+    	var user = service.usuarioSessao();
+        return ResponseEntity.ok(mapper.convert(user));
+    }
 
 }
