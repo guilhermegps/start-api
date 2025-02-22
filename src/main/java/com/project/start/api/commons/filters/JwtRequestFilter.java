@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import com.project.start.api.commons.messages.MessageManager;
 import com.project.start.api.services.JwtService;
 
 import jakarta.servlet.FilterChain;
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtRequestFilter extends OncePerRequestFilter {
 
+	private final MessageManager messages;
 	private final HandlerExceptionResolver handlerExceptionResolver;
     private final UserDetailsService userDetailsService;
     private final JwtService jwtService;
@@ -35,7 +37,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
         
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            logger.warn("JWT Token does not begin with Bearer String");
+            logger.warn(messages.get("auth.alert.nao_autenticado"));
         	chain.doFilter(request, response);
             return;
         }
@@ -47,8 +49,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 			if (StringUtils.isNoneBlank(username) && authentication == null) {
 				UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+				var valid = jwtService.isTokenValid(jwtToken, userDetails);
 
-				if (jwtService.isTokenValid(jwtToken, userDetails)) {
+				if (valid.booleanValue()) {
 					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
 							null, userDetails.getAuthorities());
 
@@ -59,7 +62,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 			chain.doFilter(request, response);
 		} catch (Exception e) {
-			e.printStackTrace();
 			handlerExceptionResolver.resolveException(request, response, null, e);
 		}
     }

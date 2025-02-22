@@ -22,12 +22,8 @@ public class AuthService {
 	private final AuthenticationManager authenticationManager;
 
 	public UsuarioLogado authenticate(@NotNull LoginDto input) {
-		try {
-			authenticationManager
-					.authenticate(new UsernamePasswordAuthenticationToken(input.getLogin(), input.getPasswd()));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		authenticationManager
+			.authenticate(new UsernamePasswordAuthenticationToken(input.getLogin(), input.getPasswd()));
 
 		return usuarioService.authUsuario(input.getLogin()).orElseThrow();
 	}
