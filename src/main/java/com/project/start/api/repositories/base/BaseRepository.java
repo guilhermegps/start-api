@@ -13,7 +13,8 @@ import com.project.start.api.domain.base.BaseEntity;
 public interface BaseRepository<E extends BaseEntity> extends JpaRepository<E, UUID>, JpaSpecificationExecutor<E> {
 
 	default Optional<E> findOneByCodigoAndAtivo(Long codigo, Boolean ativo) {
-		return this.findOne((root, query, builder) -> builder.and(
+		return this.findOne(
+					(root, query, builder) -> builder.and(
 									builder.equal(root.get("codigo"), codigo), 
 									builder.equal(root.get("ativo"), ativo))
 			    );

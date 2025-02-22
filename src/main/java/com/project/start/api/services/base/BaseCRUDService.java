@@ -38,7 +38,7 @@ public abstract class BaseCRUDService<E extends BaseEntity, D extends BaseDto> e
 		var entity = obter(code);
 		
 		var upEntity = getMapper().convert(dto);
-		BeanUtils.copyProperties(upEntity, entity, "id", "status");
+		BeanUtils.copyProperties(upEntity, entity, "id", "codigo", "ativo");
 		
 		return getRepository().save(entity);
 	}

@@ -32,7 +32,7 @@ public abstract class BaseService<E extends BaseEntity, D extends BaseDto> {
 
 	@Getter
 	@Autowired
-	protected MessageManager messageManager;
+	protected MessageManager messages;
 	
 	public E obter(Long codigo){
 		return (codigo!=null) ? getRepository().findOneByCodigoAndAtivo(codigo, Boolean.TRUE)
