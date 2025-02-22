@@ -17,6 +17,7 @@ import com.project.start.api.commons.messages.MessageManager;
 import com.project.start.api.commons.support.exceptions.BusinessException;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.SignatureException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -67,24 +68,20 @@ public class ResourceExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseError handleExpiredJwtException(ExpiredJwtException e) {
+    @ExceptionHandler({ExpiredJwtException.class, SignatureException.class, BadCredentialsException.class})
+    public ResponseError handleExpiredJwtException(Exception e) {
 		log.error(e);
+		
+		var msgKey = switch (e) {
+				    case ExpiredJwtException ex -> "auth.err.expirado";
+				    case SignatureException ex -> "auth.err.token";
+				    case BadCredentialsException ex -> "auth.err.credenciais_invalidas";
+				    default -> "auth.err.generico";
+				};
 		
         return ResponseError.builder()
                             .code(HttpStatus.FORBIDDEN.value())
-                            .description(messages.get("auth.err.expirado"))
-                            .build();
-    }
-
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseError handleBadCredentialsException(BadCredentialsException e) {
-		log.error(e);
-		
-        return ResponseError.builder()
-                            .code(HttpStatus.FORBIDDEN.value())
-                            .description(messages.get("auth.err.credenciais_invalidas"))
+                            .description(messages.get(msgKey))
                             .build();
     }
 
