@@ -27,5 +27,8 @@ public abstract class BaseEntity {
 
 	@Column(nullable = false)
 	protected Boolean ativo;
+
+	@Column(nullable = false, insertable = false, updatable = false, columnDefinition="serial", unique = true)
+	protected Long codigo;
 	
 }

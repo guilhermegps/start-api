@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.project.start.api.commons.messages.MessageManager;
 import com.project.start.api.commons.support.exceptions.BusinessException;
+import com.project.start.api.commons.support.exceptions.NotFoundException;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
@@ -69,7 +70,7 @@ public class ResourceExceptionHandler {
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler({ExpiredJwtException.class, SignatureException.class, BadCredentialsException.class})
-    public ResponseError handleExpiredJwtException(Exception e) {
+    public ResponseError handleJwtException(Exception e) {
 		log.error(e);
 		
 		var msgKey = switch (e) {
@@ -97,13 +98,17 @@ public class ResourceExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(NoSuchElementException.class)
+    @ExceptionHandler({NoSuchElementException.class, NotFoundException.class})
     public ResponseError handleNotFoundExceptions(NoSuchElementException ex) {
 		log.error(ex);
 		
+		var msg = (ex instanceof NotFoundException nfe) 
+				? messages.get("db.alert.nao_encontrado", nfe.getEntityName(), nfe.getCode())
+				: messages.get("sys.err.nao_encontrado");
+		
         return ResponseError.builder()
                             .code(HttpStatus.NOT_FOUND.value())
-                            .description(messages.get("sys.err.nao_encontrado"))
+                            .description(msg)
                             .build();
     }
 

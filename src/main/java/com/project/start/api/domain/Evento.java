@@ -1,6 +1,6 @@
 package com.project.start.api.domain;
 
-import com.project.start.api.domain.base.BaseEntityComplete;
+import com.project.start.api.domain.base.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,7 +22,7 @@ import lombok.experimental.SuperBuilder;
 @Table(schema = "START")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Evento extends BaseEntityComplete {
+public class Evento extends BaseEntity {
 	
 	@Column(nullable = false)
 	private String descricao;

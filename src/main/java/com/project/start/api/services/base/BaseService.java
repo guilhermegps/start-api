@@ -4,20 +4,39 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
+import com.project.start.api.commons.messages.MessageManager;
+import com.project.start.api.commons.support.exceptions.NotFoundException;
+import com.project.start.api.domain.base.BaseDto;
 import com.project.start.api.domain.base.BaseEntity;
+import com.project.start.api.domain.base.BaseMapper;
 import com.project.start.api.repositories.base.BaseRepository;
 
-public abstract class BaseService<E extends BaseEntity> {
+import lombok.Getter;
+
+@Validated
+@Component
+public abstract class BaseService<E extends BaseEntity, D extends BaseDto> {
 
 	protected abstract BaseRepository<E> getRepository();
+    public abstract BaseMapper<E, D> getMapper();
+    public abstract String getEntityName();
 
-	public E save(E entity) {
-		return getRepository().save(entity);
+	@Getter
+	@Autowired
+	protected MessageManager messageManager;
+	
+	public E obter(Long codigo){
+		return (codigo!=null) ? getRepository().findOneByCodigoAndAtivo(codigo, Boolean.TRUE)
+				.orElseThrow(() -> new NotFoundException(getEntityName(), codigo)) : null;
 	}
 
 	public Page<E> findAll(Pageable pageable) {
@@ -66,6 +85,32 @@ public abstract class BaseService<E extends BaseEntity> {
 
 	public List<E> findAll(Example<E> example, Sort sort) {
 		return getRepository().findAll(example, sort);
+	}
+
+    @Transactional(readOnly = true)
+	public D convert(E entity) {
+    	if(entity!=null)
+    		entity = getRepository().getReferenceById(entity.getId());
+
+		return getMapper().convert(entity);
+	}
+
+    @Transactional(readOnly = true)
+    public List<D> convert(List<E> lista) {
+    	if(lista!=null)
+    		lista = lista.stream()
+    		.map(entity -> getRepository().getReferenceById(entity.getId()))
+    		.toList();
+
+		return getMapper().convert(lista);
+	}
+
+    @Transactional(readOnly = true)
+    public Page<D> convert(Page<E> page) {
+    	if(page!=null)
+    		page = page.map(entity -> getRepository().getReferenceById(entity.getId()));
+
+		return getMapper().convert(page);
 	}
 
 }
