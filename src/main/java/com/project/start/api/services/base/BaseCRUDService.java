@@ -17,9 +17,10 @@ import jakarta.validation.constraints.NotNull;
 public abstract class BaseCRUDService<E extends BaseEntity, D extends BaseDto> extends BaseService<E, D> {
 
     public ValidationInterface<D> validation() { return null; }
+//    protected List<String> notUpdatable = new ArrayList<>(List.of("id", "codigo", "ativo"));
 
 	@Transactional
-	public E cadastrar(@NotNull D input) {
+	public E create(@NotNull D input) {
 		if (Objects.nonNull(validation()))
 			validation().create(input);
 
@@ -31,20 +32,20 @@ public abstract class BaseCRUDService<E extends BaseEntity, D extends BaseDto> e
 	}
 
 	@Transactional
-	public E alterar(@NotNull Long code, @NotNull D dto){
+	public E update(@NotNull Long code, @NotNull D input){
 		if (Objects.nonNull(validation()))
-			validation().update(code, dto);
+			validation().update(code, input);
 
 		var entity = obter(code);
 		
-		var upEntity = getMapper().convert(dto);
-		BeanUtils.copyProperties(upEntity, entity, "id", "codigo", "ativo");
+		var upEntity = getMapper().convert(input);
+		BeanUtils.copyProperties(upEntity, entity, "id", "codigo", "ativo" );
 		
 		return getRepository().save(entity);
 	}
 
 	@Transactional
-	public E inativar(@NotNull Long code){
+	public E disable(@NotNull Long code){
 		var entity = obter(code);
 		entity.setAtivo(Boolean.FALSE);
 		
@@ -52,7 +53,7 @@ public abstract class BaseCRUDService<E extends BaseEntity, D extends BaseDto> e
 	}
 
 	@Transactional
-	public Long excluir(@NotNull Long code) {
+	public Long remove(@NotNull Long code) {
 		var entity = obter(code);
 		getRepository().delete(entity);
 

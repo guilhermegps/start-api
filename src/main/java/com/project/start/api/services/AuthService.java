@@ -2,7 +2,6 @@ package com.project.start.api.services;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -16,9 +15,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-	
+
 	private final UsuarioService usuarioService;
-	private final PasswordEncoder passwordEncoder;
 	private final AuthenticationManager authenticationManager;
 
 	public UsuarioLogado authenticate(@NotNull LoginDto input) {
