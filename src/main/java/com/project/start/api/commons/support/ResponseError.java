@@ -1,6 +1,7 @@
 package com.project.start.api.commons.support;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -19,6 +20,6 @@ public class ResponseError {
 
     private int code;
     private String description;
-    private Map<String, String> fields = new HashMap<>();
+    private Map<String, List<String>> fields = new HashMap<>();
 
 }

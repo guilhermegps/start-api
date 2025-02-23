@@ -1,8 +1,14 @@
 package com.project.start.api.commons.support;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -19,7 +25,6 @@ import com.project.start.api.commons.support.exceptions.NotFoundException;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
-import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -34,38 +39,46 @@ public class ResourceExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseError handleValidationExceptions(MethodArgumentNotValidException ex) {
 		log.error(ex);
+
+	    Map<String, List<String>> fields = new HashMap<>();
+		ex.getBindingResult().getAllErrors().forEach(e -> {
+			var key = ((FieldError) e).getField();
+			var val = messages.get(e);
+			
+			if(fields.containsKey(key))
+				fields.get(key).add(val);
+			else
+				fields.put(key, new ArrayList<>(List.of(val)));
+		});
 		
-        var responseError = ResponseError.builder()
-                                         .code(HttpStatus.BAD_REQUEST.value())
-                                         .description(messages.get("vdt.err.campo_invalido"))
-                                         .build();
-
-        ex.getBindingResult().getAllErrors().forEach(e -> {
-            String fieldName = ((FieldError) e).getField();
-            String errorMessage = e.getDefaultMessage();
-            responseError.getFields().put(fieldName, errorMessage);
-        });
-
-        return responseError;
+        return ResponseError.builder()
+                .code(HttpStatus.BAD_REQUEST.value())
+                .description(messages.get("vdt.err.campo_invalido"))
+                .fields(fields)
+                .build();
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseError handleConstraintViolationException(ConstraintViolationException ex) {
+    @ExceptionHandler(jakarta.validation.ConstraintViolationException.class)
+    public ResponseError handleConstraintViolationException(jakarta.validation.ConstraintViolationException ex) {
 		log.error(ex);
-        var responseError = ResponseError.builder()
-                                         .code(HttpStatus.BAD_REQUEST.value())
-                                         .description(ex.getMessage())
-                                         .fields(new HashMap<>())
-                                         .build();
 
-        ex.getConstraintViolations().forEach(cv -> {
-            String fieldName = cv.getPropertyPath() == null ? "" : cv.getPropertyPath().toString();
-            String errorMessage = cv.getMessage();
-            responseError.getFields().put(fieldName, errorMessage);
-        });
-
-        return responseError;
+	    Map<String, List<String>> fields = new HashMap<>();
+	    ex.getConstraintViolations().forEach(cv -> {
+			var key = cv.getPropertyPath() == null ? "" : cv.getPropertyPath().toString();
+			var val = cv.getMessage();
+			
+			if(fields.containsKey(key))
+				fields.get(key).add(val);
+			else
+				fields.put(key, new ArrayList<>(List.of(val)));
+		});
+		
+        return ResponseError.builder()
+                .code(HttpStatus.BAD_REQUEST.value())
+                .description(messages.get("vdt.err.campo_invalido"))
+                .fields(fields)
+                .build();
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
@@ -83,6 +96,19 @@ public class ResourceExceptionHandler {
         return ResponseError.builder()
                             .code(HttpStatus.FORBIDDEN.value())
                             .description(messages.get(msgKey))
+                            .build();
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseError handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+		log.error(e);
+		var constEx = ExceptionUtils.throwableOfThrowable(e, ConstraintViolationException.class);
+		var constName = constEx.getConstraintName();
+		
+        return ResponseError.builder()
+                            .code(HttpStatus.BAD_REQUEST.value())
+                            .description(messages.get("db.err.constraint", constName))
                             .build();
     }
 
