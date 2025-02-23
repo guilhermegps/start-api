@@ -11,6 +11,7 @@ import com.project.start.api.domain.dtos.UsuarioDto;
 public interface UsuarioMapper extends BaseMapper<Usuario, UsuarioDto> {
 	
 	@Mapping(target = "senha", ignore = true)
+	@Mapping(target = "perfil", expression = "java( PerfilEnum.valueOf(entity.getPerfil().getId()))")
 	UsuarioDto convert(Usuario entity);
 
 }

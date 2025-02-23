@@ -16,7 +16,7 @@ public abstract class BaseCRUDController<E extends BaseEntity, D extends BaseDto
 	protected ResponseEntity<D> create(D input){
 		  var entity = getService().create(input);
 		  
-	    return ResponseEntity.ok(getService().getMapper().convert(entity));
+	    return ResponseEntity.ok(getService().convert(entity));
 	}
 
 	protected ResponseEntity<String> update(Long codigo, D input) {

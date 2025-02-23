@@ -2,7 +2,7 @@
 --changeset guilherme.gps:CREATE_AUTH_TABLES
 CREATE TABLE START.perfil (
 	id UUID DEFAULT RANDOM_UUID() NOT NULL,
-	codigo INT GENERATED ALWAYS AS IDENTITY NOT NULL UNIQUE,
+	codigo INT auto_increment NOT NULL UNIQUE,
 	ativo bool DEFAULT true NOT NULL,
 	descricao varchar(50) NOT NULL,
 	CONSTRAINT pk_perfil PRIMARY KEY (id)
@@ -10,7 +10,7 @@ CREATE TABLE START.perfil (
 
 CREATE TABLE START.usuario (
 	id UUID DEFAULT RANDOM_UUID() NOT NULL,
-	codigo INT GENERATED ALWAYS AS IDENTITY NOT NULL UNIQUE,
+	codigo INT auto_increment NOT NULL UNIQUE,
 	ativo bool DEFAULT true NOT NULL,
 	id_perfil UUID NULL,
 	login varchar(50) NOT NULL UNIQUE,
@@ -24,7 +24,7 @@ CREATE TABLE START.usuario (
 
 CREATE TABLE START.tipo_evento (
 	id UUID DEFAULT RANDOM_UUID() NOT NULL,
-	codigo INT GENERATED ALWAYS AS IDENTITY NOT NULL UNIQUE,
+	codigo INT auto_increment NOT NULL UNIQUE,
 	ativo bool DEFAULT true NOT NULL,
 	descricao varchar(60) NOT NULL,
 	CONSTRAINT pk_tipo_evento PRIMARY KEY (id)
@@ -32,7 +32,7 @@ CREATE TABLE START.tipo_evento (
 
 CREATE TABLE START.evento (
 	id UUID DEFAULT RANDOM_UUID() NOT NULL,
-	codigo INT GENERATED ALWAYS AS IDENTITY NOT NULL UNIQUE,
+	codigo INT auto_increment NOT NULL UNIQUE,
 	ativo bool DEFAULT true NOT NULL,
 	dt_registro timestamp DEFAULT now() NOT NULL,
 	id_usuario UUID NOT NULL,

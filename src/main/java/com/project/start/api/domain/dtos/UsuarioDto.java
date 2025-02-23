@@ -3,8 +3,10 @@ package com.project.start.api.domain.dtos;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.project.start.api.domain.base.BaseDto;
+import com.project.start.api.domain.enumerations.PerfilEnum;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,5 +41,8 @@ public class UsuarioDto extends BaseDto {
 	@NotBlank
 	@Size(max =  50, min = 5)
 	private String email;
+
+	@NotNull
+	private PerfilEnum perfil;
 
 }

@@ -1,5 +1,7 @@
 package com.project.start.api.domain;
 
+import java.util.UUID;
+
 import com.project.start.api.domain.base.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -23,5 +25,9 @@ public class Perfil extends BaseEntity {
 
 	@Column(length = 50, nullable = false)
 	private String descricao;
+
+	public Perfil(UUID id) {
+		this.id = id;
+	}
 
 }
