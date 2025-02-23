@@ -3,6 +3,7 @@ package com.project.start.api.controllers;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +38,7 @@ public class UsuarioController extends BaseCRUDController<Usuario, UsuarioDto> {
         return toResponse(user);
     }
 
+    @PreAuthorize("hasAnyAuthority('ADM', 'USER')")
     @GetMapping("listar")
     public ResponseEntity<List<UsuarioDto>> listarTodos() {
     	var lista = service.findAll();
@@ -48,6 +50,7 @@ public class UsuarioController extends BaseCRUDController<Usuario, UsuarioDto> {
         return detail(cod);
     }
 
+    @PreAuthorize("hasRole('ADM')")
     @PostMapping
     public ResponseEntity<UsuarioDto> criar(@RequestBody @Valid final UsuarioDto input) {
         return create(input);

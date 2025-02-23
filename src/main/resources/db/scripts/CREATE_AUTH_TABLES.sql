@@ -12,7 +12,7 @@ CREATE TABLE START.usuario (
 	id UUID DEFAULT RANDOM_UUID() NOT NULL,
 	codigo INT auto_increment NOT NULL UNIQUE,
 	ativo bool DEFAULT true NOT NULL,
-	id_perfil UUID NULL,
+	id_perfil UUID NOT NULL,
 	login varchar(50) NOT NULL UNIQUE,
 	nome varchar(100) NOT NULL,
 	cpf varchar(11) NOT NULL UNIQUE,

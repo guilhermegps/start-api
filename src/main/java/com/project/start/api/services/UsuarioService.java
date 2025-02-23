@@ -1,19 +1,21 @@
 package com.project.start.api.services;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import com.project.start.api.domain.Usuario;
 import com.project.start.api.domain.dtos.UsuarioDto;
-import com.project.start.api.domain.dtos.UsuarioLogado;
+import com.project.start.api.domain.enumerations.PerfilEnum;
 import com.project.start.api.domain.mappers.UsuarioMapper;
 import com.project.start.api.repositories.UsuarioRepository;
 import com.project.start.api.services.base.BaseCRUDService;
@@ -41,15 +43,18 @@ public class UsuarioService extends BaseCRUDService<Usuario, UsuarioDto> {
 		return repository.findOneByLoginAndAtivo(login, Boolean.TRUE);
 	}
 	
-	public Optional<UsuarioLogado> authUsuario(String username) {
+	public Optional<User> authUsuario(String username) {
 		var opt = repository.findOneByLoginAndAtivo(username, Boolean.TRUE);
 		
-		return opt.map(u -> UsuarioLogado.builder()
-				.username(u.getLogin())
-				.password(u.getSenha())
-				.enabled(true)
-				.build()
-			);
+		return opt.map(u -> {
+				var perfil = PerfilEnum.valueOf(u.getPerfil().getId());
+			
+				return (User) User
+				        .withUsername(u.getLogin())
+				        .password(u.getSenha())
+				        .authorities(List.of(perfil.name()).toArray(new String[0]))
+				        .build();
+			});
 	}
 
 	public Usuario usuarioSessao() {
@@ -62,7 +67,7 @@ public class UsuarioService extends BaseCRUDService<Usuario, UsuarioDto> {
 			var authenticated = userPAToken.isAuthenticated();
 			
 			if(authenticated) {
-				var logado = (UsuarioLogado) userPAToken.getPrincipal();
+				var logado = (User) userPAToken.getPrincipal();
 				
 				return findByLogin(logado.getUsername());
 			}
