@@ -3,6 +3,9 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+.project
+.classpath
+factoryConfiguration.json
 
 ### STS ###
 .apt_generated
@@ -12,6 +15,19 @@ target/
 .settings
 .springBeans
 .sts4-cache
+
+### Eclipse ###
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
 
 ### IntelliJ IDEA ###
 .idea
