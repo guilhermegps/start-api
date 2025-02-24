@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.project.start.api.commons.messages.MessageManager;
 import com.project.start.api.commons.support.exceptions.BusinessException;
@@ -106,7 +107,7 @@ public class ResourceExceptionHandler {
 		log.error(e);
 		
         return ResponseError.builder()
-                            .code(HttpStatus.FORBIDDEN.value())
+                            .code(HttpStatus.NOT_FOUND.value())
                             .description(messages.get("sys.err.nao_encontrado"))
                             .build();
     }
@@ -136,8 +137,8 @@ public class ResourceExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({NoSuchElementException.class, NotFoundException.class})
-    public ResponseError handleNotFoundExceptions(NoSuchElementException ex) {
+    @ExceptionHandler({NoSuchElementException.class, NotFoundException.class, NoResourceFoundException.class})
+    public ResponseError handleNotFoundExceptions(Exception ex) {
 		log.error(ex);
 		
 		var msg = (ex instanceof NotFoundException nfe) 
