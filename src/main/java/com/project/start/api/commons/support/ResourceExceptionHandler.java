@@ -12,6 +12,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -96,6 +97,17 @@ public class ResourceExceptionHandler {
         return ResponseError.builder()
                             .code(HttpStatus.FORBIDDEN.value())
                             .description(messages.get(msgKey))
+                            .build();
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler({AuthorizationDeniedException.class})
+    public ResponseError handleAccessException(AuthorizationDeniedException e) {
+		log.error(e);
+		
+        return ResponseError.builder()
+                            .code(HttpStatus.FORBIDDEN.value())
+                            .description(messages.get("sys.err.nao_encontrado"))
                             .build();
     }
 

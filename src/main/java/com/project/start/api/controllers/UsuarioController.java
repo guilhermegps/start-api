@@ -32,36 +32,40 @@ public class UsuarioController extends BaseCRUDController<Usuario, UsuarioDto> {
 	@Getter
     private final UsuarioService service;
 
+	@PreAuthorize("hasAnyAuthority('ADM', 'USER')")
     @GetMapping
     public ResponseEntity<UsuarioDto> usuarioSessao() {
     	var user = service.usuarioSessao();
         return toResponse(user);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADM', 'USER')")
+    @PreAuthorize("hasAuthority('ADM')")
     @GetMapping("listar")
     public ResponseEntity<List<UsuarioDto>> listarTodos() {
     	var lista = service.findAll();
         return toResponse(lista);
     }
 
+    @PreAuthorize("hasAuthority('ADM')")
     @GetMapping("{cod}")
     public ResponseEntity<UsuarioDto> detalhar(@PathVariable Long cod) {
         return detail(cod);
     }
 
-    @PreAuthorize("hasRole('ADM')")
+    @PreAuthorize("hasAuthority('ADM')")
     @PostMapping
     public ResponseEntity<UsuarioDto> criar(@RequestBody @Valid final UsuarioDto input) {
         return create(input);
     }
 
+    @PreAuthorize("hasAuthority('ADM')")
     @PutMapping("{cod}")
     public ResponseEntity<String> alterar(@PathVariable Long cod, 
     		@RequestBody @Valid final UsuarioDto input) {
         return update(cod, input);
     }
 
+    @PreAuthorize("hasAuthority('ADM')")
     @DeleteMapping("{cod}")
     public ResponseEntity<String> inatiar(@PathVariable Long cod) {
         return disable(cod);
