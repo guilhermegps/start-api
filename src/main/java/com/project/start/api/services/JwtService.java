@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class JwtService {
     private Long jwtExpiration;
 
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        return isTokenValid(token) ? extractClaim(token, Claims::getSubject) : null;
     }
 
     public Date extractExpiration(String token) {
@@ -41,8 +42,8 @@ public class JwtService {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
     }
 
-    private Boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+    private boolean isTokenExpired(String token) {
+        return StringUtils.isBlank(token) || extractExpiration(token).before(new Date());
     }
 
     public AccessTokenDto generateToken(UserDetails userDetails) {
@@ -61,8 +62,12 @@ public class JwtService {
                 .signWith(SignatureAlgorithm.HS256, secretKey);
     }
 
-    public Boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String token) {
+		return !isTokenExpired(token);
+    }
+
+    public boolean isValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return StringUtils.isNotBlank(username) && username.equals(userDetails.getUsername()) && isTokenValid(token);
     }
 }

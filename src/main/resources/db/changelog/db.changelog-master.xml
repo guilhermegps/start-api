@@ -7,4 +7,5 @@
 
 	<include file="db/scripts/CREATE_AUTH_TABLES.sql"/>
 	<include file="db/scripts/INSERT_CREDENTIAL_ADM.sql"/>
+	<include file="db/scripts/INSERT_EVENTS_TYPES.sql"/>
 </databaseChangeLog>

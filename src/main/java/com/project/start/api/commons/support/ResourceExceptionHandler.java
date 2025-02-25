@@ -26,6 +26,7 @@ import com.project.start.api.commons.support.exceptions.BusinessException;
 import com.project.start.api.commons.support.exceptions.NotFoundException;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -84,13 +85,14 @@ public class ResourceExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler({ExpiredJwtException.class, SignatureException.class, BadCredentialsException.class})
+    @ExceptionHandler({ExpiredJwtException.class, SignatureException.class, BadCredentialsException.class, MalformedJwtException.class})
     public ResponseError handleJwtException(Exception e) {
 		log.error(e);
 		
 		var msgKey = switch (e) {
 				    case ExpiredJwtException ex -> "auth.err.expirado";
 				    case SignatureException ex -> "auth.err.token";
+				    case MalformedJwtException ex -> "auth.err.token";
 				    case BadCredentialsException ex -> "auth.err.credenciais_invalidas";
 				    default -> "auth.err.generico";
 				};
@@ -154,7 +156,7 @@ public class ResourceExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ResponseError handleException(Exception e) {
-		log.error(e);
+		e.printStackTrace();
 		
         return ResponseError.builder()
                             .code(HttpStatus.INTERNAL_SERVER_ERROR.value())

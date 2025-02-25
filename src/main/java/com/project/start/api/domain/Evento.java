@@ -1,5 +1,7 @@
 package com.project.start.api.domain;
 
+import java.time.LocalDateTime;
+
 import com.project.start.api.domain.base.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -31,11 +33,14 @@ public class Evento extends BaseEntity {
 	private String ipUsuario;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_usuario")
+	@JoinColumn(name = "id_usuario", nullable = false)
 	private Usuario usuario;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_tipo_evento")
+	@JoinColumn(name = "id_tipo_evento", nullable = false)
 	private TipoEvento tipoEvento;
+	
+	@Column(name = "dt_registro", nullable = false)
+	private LocalDateTime dtRegistro;
 
 }

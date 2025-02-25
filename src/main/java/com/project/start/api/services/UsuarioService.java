@@ -42,20 +42,6 @@ public class UsuarioService extends BaseCRUDService<Usuario, UsuarioDto> {
 	public Optional<Usuario> findByLogin(String login) {
 		return repository.findOneByLoginAndAtivo(login, Boolean.TRUE);
 	}
-	
-	public Optional<User> authUsuario(String username) {
-		var opt = repository.findOneByLoginAndAtivo(username, Boolean.TRUE);
-		
-		return opt.map(u -> {
-				var perfil = PerfilEnum.valueOf(u.getPerfil().getId());
-			
-				return (User) User
-				        .withUsername(u.getLogin())
-				        .password(u.getSenha())
-				        .authorities(List.of(perfil.name()).toArray(new String[0]))
-				        .build();
-			});
-	}
 
 	public Usuario usuarioSessao() {
 		return getUsuarioLogado().orElseThrow();

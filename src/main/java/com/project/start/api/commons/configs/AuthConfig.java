@@ -2,6 +2,7 @@ package com.project.start.api.commons.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -12,16 +13,17 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.project.start.api.services.UsuarioService;
+import com.project.start.api.services.AuthService;
 
 import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Lazy))
 public class AuthConfig {
 	
-    private final UsuarioService usuarioService;
+	@Lazy
+    private final AuthService authService;
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -35,8 +37,8 @@ public class AuthConfig {
 
     @Bean
     UserDetailsService userDetailsService() {
-        return username -> usuarioService.authUsuario(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return username -> authService.authUsuario(username)
+	            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Bean

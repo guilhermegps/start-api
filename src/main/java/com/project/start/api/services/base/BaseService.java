@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +19,9 @@ import com.project.start.api.commons.support.exceptions.NotFoundException;
 import com.project.start.api.domain.base.BaseDto;
 import com.project.start.api.domain.base.BaseEntity;
 import com.project.start.api.domain.base.BaseMapper;
+import com.project.start.api.domain.enumerations.TipoEventoEnum;
 import com.project.start.api.repositories.base.BaseRepository;
+import com.project.start.api.services.EventoService;
 
 import lombok.Getter;
 
@@ -33,10 +36,15 @@ public abstract class BaseService<E extends BaseEntity, D extends BaseDto> {
 	@Getter
 	@Autowired
 	protected MessageManager messages;
+	@Lazy
+	@Autowired
+	protected EventoService eventoService;
 	
 	public E obter(Long codigo){
-		return (codigo!=null) ? getRepository().findOneByCodigoAndAtivo(codigo, Boolean.TRUE)
+		var entity = (codigo!=null) ? getRepository().findOneByCodigoAndAtivo(codigo, Boolean.TRUE)
 				.orElseThrow(() -> new NotFoundException(getEntityName(), codigo)) : null;
+		
+		return entity;
 	}
 
 	public Page<E> findAll(Pageable pageable) {
@@ -111,6 +119,10 @@ public abstract class BaseService<E extends BaseEntity, D extends BaseDto> {
     		page = page.map(entity -> getRepository().getReferenceById(entity.getId()));
 
 		return getMapper().convert(page);
+	}
+	
+    public void regEvento(TipoEventoEnum tipo, String keyMsg, Object... params) {
+		eventoService.registrar(tipo, getMessages().get(keyMsg, params));
 	}
 
 }

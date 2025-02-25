@@ -17,7 +17,6 @@ import jakarta.validation.constraints.NotNull;
 public abstract class BaseCRUDService<E extends BaseEntity, D extends BaseDto> extends BaseService<E, D> {
 
     public ValidationInterface<D> validation() { return null; }
-//    protected List<String> notUpdatable = new ArrayList<>(List.of("id", "codigo", "ativo"));
 
 	@Transactional
 	public E create(@NotNull D input) {

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.project.start.api.commons.messages.MessageManager;
 import com.project.start.api.domain.base.BaseDto;
 import com.project.start.api.domain.base.BaseEntity;
+import com.project.start.api.domain.enumerations.TipoEventoEnum;
 import com.project.start.api.services.base.BaseService;
 
 @RestControllerAdvice
@@ -39,14 +40,27 @@ public abstract class BaseController<E extends BaseEntity, D extends BaseDto> {
 	}
 	
 	protected ResponseEntity<D> toResponse(D dto){
-		return Optional.ofNullable(dto).map(ResponseEntity::ok).orElseThrow(NoSuchElementException::new);
+		var response = Optional.ofNullable(dto).map(ResponseEntity::ok).orElseThrow(NoSuchElementException::new);
+		
+		regEvento(TipoEventoEnum.VISUALIZACAO, "log.alert.registro", getService().getEntityName(), dto.getCodigo());
+		return response;
 	}
 	
 	protected ResponseEntity<List<D>> toResponse(List<E> lista){
-		return ResponseEntity.ok(getService().convert(lista));
+		var response = ResponseEntity.ok(getService().convert(lista));
+		
+		regEvento(TipoEventoEnum.VISUALIZACAO, "log.alert.listagem", getService().getEntityName());
+		return response;
 	}
 	
 	protected ResponseEntity<Page<D>> toResponse(Page<E> page){
-		return ResponseEntity.ok(getService().convert(page));
+		var response = ResponseEntity.ok(getService().convert(page));
+		
+		regEvento(TipoEventoEnum.VISUALIZACAO, "log.alert.listagem", getService().getEntityName());
+		return response;
+	}
+	
+	protected void regEvento(TipoEventoEnum tipo, String keyMsg, Object... params) {
+		getService().regEvento(tipo, getMessages().get(keyMsg, params));
 	}
 }
