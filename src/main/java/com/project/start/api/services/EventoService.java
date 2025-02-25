@@ -2,8 +2,11 @@ package com.project.start.api.services;
 
 import java.time.LocalDateTime;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.project.start.api.domain.Evento;
 import com.project.start.api.domain.Usuario;
@@ -34,10 +37,33 @@ public class EventoService {
 				.descricao(descricao)
 				.usuario(usuario)
 				.dtRegistro(LocalDateTime.now())
+				.ipUsuario(getRequestIp())
 				.ativo(Boolean.TRUE)
 				.build();
 		
 		repository.save(evento);
 	}
+
+	
+	/**
+	 * Irá retornar o IP da requisição.
+	 * Para que ele retorne sempre um Ipv4 é necessário configurar na JVM -Djava.net.preferIPv4Stack=true
+	 * 
+	 * @return String ip
+	 */
+	public static String getRequestIp() {
+		var sra = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes());
+		
+		if(sra!=null) {
+			var request = sra.getRequest();
+			var remoteAddr = request.getHeader("X-FORWARDED-FOR");
+			if (StringUtils.isBlank(remoteAddr))
+				remoteAddr = request.getRemoteAddr();
+			
+			return remoteAddr;
+		}
+		
+		return null;
+    }
 
 }
